@@ -40,10 +40,6 @@ class Username with _$Username {
       return false;
     }
 
-    if (name.length > 20) {
-      return false;
-    }
-
     return true;
   }
 
