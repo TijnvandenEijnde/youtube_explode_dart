@@ -2,17 +2,18 @@
 
 // ignore_for_file: non_constant_identifier_names, require_trailing_commas
 
-part of 'bitrate.dart';
+part of 'filesize.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$_Bitrate _$$_BitrateFromJson(Map<String, dynamic> json) => _$_Bitrate(
-      json['bitsPerSecond'] as int,
+_$FileSizeImpl _$$FileSizeImplFromJson(Map<String, dynamic> json) =>
+    _$FileSizeImpl(
+      json['totalBytes'] as int,
     );
 
-Map<String, dynamic> _$$_BitrateToJson(_$_Bitrate instance) =>
+Map<String, dynamic> _$$FileSizeImplToJson(_$FileSizeImpl instance) =>
     <String, dynamic>{
-      'bitsPerSecond': instance.bitsPerSecond,
+      'totalBytes': instance.totalBytes,
     };

@@ -8,7 +8,6 @@ import '../reverse_engineering/pages/watch_page.dart';
 import '../reverse_engineering/youtube_http_client.dart';
 import '../videos/video.dart';
 import '../videos/video_id.dart';
-import 'channel_handle.dart';
 import 'channels.dart';
 
 /// Queries related to YouTube channels.
@@ -94,6 +93,8 @@ class ChannelClient {
   /// Gets the info found on a YouTube Channel About page.
   /// [username] must be either a [Username] or a string
   /// which is parsed to a [Username]
+  ///
+  /// WARNING: As of v2.2.0 this is broken due to yt updates.
   Future<ChannelAbout> getAboutPageByUsername(dynamic username) async {
     username = Username.fromString(username);
 
@@ -135,17 +136,20 @@ class ChannelClient {
 
   /// Enumerates videos uploaded by the specified channel.
   /// This fetches thru all the uploads pages of the channel.
+  /// The content by default is sorted by time of upload.
   ///
   /// Use .nextPage() to fetch the next batch of videos.
   Future<ChannelUploadsList> getUploadsFromPage(
-    dynamic channelId, [
+    dynamic channelId, {
     VideoSorting videoSorting = VideoSorting.newest,
-  ]) async {
+    VideoType videoType = VideoType.normal,
+  }) async {
     channelId = ChannelId.fromString(channelId);
     final page = await ChannelUploadPage.get(
       _httpClient,
       (channelId as ChannelId).value,
       videoSorting.code,
+      videoType,
     );
 
     final channel = await get(channelId);

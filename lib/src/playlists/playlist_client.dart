@@ -1,5 +1,6 @@
 import '../channels/channel_id.dart';
 import '../common/common.dart';
+import '../extensions/helpers_extension.dart';
 import '../reverse_engineering/pages/playlist_page.dart';
 import '../reverse_engineering/youtube_http_client.dart';
 import '../videos/video.dart';
@@ -35,7 +36,7 @@ class PlaylistClient {
   Stream<Video> getVideos(dynamic id) async* {
     id = PlaylistId.fromString(id);
     final encounteredVideoIds = <String>{};
-
+    var prevLength = 0;
     PlaylistPage? page = await PlaylistPage.get(_httpClient, id.value);
 
     while (page != null) {
@@ -56,8 +57,8 @@ class PlaylistClient {
           video.title,
           video.author,
           ChannelId(video.channelId),
-          null,
-          null,
+          video.uploadDateRaw.toDateTime(),
+          video.uploadDateRaw,
           null,
           video.description,
           video.duration,
@@ -67,6 +68,10 @@ class PlaylistClient {
           false,
         );
       }
+      if (encounteredVideoIds.length == prevLength) {
+        break;
+      }
+      prevLength = encounteredVideoIds.length;
       page = await page.nextPage(_httpClient);
     }
   }

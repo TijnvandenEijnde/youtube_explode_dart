@@ -2,17 +2,18 @@
 
 // ignore_for_file: non_constant_identifier_names, require_trailing_commas
 
-part of 'filesize.dart';
+part of 'video_id.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$_FileSize _$$_FileSizeFromJson(Map<String, dynamic> json) => _$_FileSize(
-      json['totalBytes'] as int,
+_$VideoIdImpl _$$VideoIdImplFromJson(Map<String, dynamic> json) =>
+    _$VideoIdImpl(
+      json['value'] as String,
     );
 
-Map<String, dynamic> _$$_FileSizeToJson(_$_FileSize instance) =>
+Map<String, dynamic> _$$VideoIdImplToJson(_$VideoIdImpl instance) =>
     <String, dynamic>{
-      'totalBytes': instance.totalBytes,
+      'value': instance.value,
     };

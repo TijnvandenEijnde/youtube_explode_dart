@@ -4,6 +4,7 @@ import 'package:collection/collection.dart';
 import 'package:http_parser/http_parser.dart';
 
 import '../../extensions/helpers_extension.dart';
+import '../../videos/streams/models/audio_track.dart';
 import '../models/stream_info_provider.dart';
 
 ///
@@ -95,8 +96,8 @@ class PlayerResponse {
           // extract the preview video ID using regex.
           ?.replaceAll('-', '+')
           .replaceAll('_', '/')
-          .pipe(base64.decode)
-          .pipe(utf8.decode)
+          .pipe((e) => base64.decode(e))
+          .pipe((e) => utf8.decode(e, allowMalformed: true))
           .pipe(
             (value) => RegExp('video_id=(.{11})').firstMatch(value)?.group(1),
           )
@@ -242,6 +243,18 @@ class _StreamInfo extends StreamInfoProvider {
 
   @override
   late final MediaType codec = _getMimeType()!;
+
+  @override
+  late final AudioTrack? audioTrack = () {
+    if (root.containsKey('audioTrack')) {
+      final audioTrack = root.get('audioTrack')!;
+      return AudioTrack(
+        displayName: audioTrack.getT<String>('displayName')!,
+        id: audioTrack.getT<String>('id')!,
+        audioIsDefault: audioTrack.getT<bool>('audioIsDefault')!,
+      );
+    }
+  }();
 
   MediaType? _getMimeType() {
     final mime = root.getT<String>('mimeType');

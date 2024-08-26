@@ -1,7 +1,7 @@
 // From: https://github.com/Tyrrrz/YoutubeExplode/blob/master/YoutubeExplode.Tests/TestData/VideoIds.cs
 
 enum VideoIdData {
-  normal('9bZkp7q19f0'),
+  normal('mKdjycj-7eE'),
   unlisted('UGh4_HsibAE'),
   private('pb_hHv3fByo'),
   deleted('qld9w0b-1ao'),
@@ -47,14 +47,12 @@ enum VideoIdData {
     withBrokenClosedCaptions,
   ];
 
-  // Videos whose streams can be fetched.
-  static const playable = [
+  // Videos that have a viewable watch page without any restriction.
+  static const validWatchpage = [
     normal,
     unlisted,
     embedRestrictedByYouTube,
     embedRestrictedByAuthor,
-    ageRestrictedViolent,
-    ageRestrictedSexual,
     ageRestrictedEmbedRestricted,
     liveStreamRecording,
     withBrokenTitle,
@@ -63,6 +61,13 @@ enum VideoIdData {
     withHighDynamicRangeStreams,
     withClosedCaptions,
     withBrokenClosedCaptions,
+  ];
+
+  // Videos whose streams can be fetched.
+  static const playable = [
+    ...VideoIdData.validWatchpage,
+    ageRestrictedViolent,
+    ageRestrictedSexual,
   ];
 
   // Cannot fetch metadata or streams.

@@ -49,7 +49,7 @@ void main() {
     final videos = await yt!.playlists
         .getVideos(
           PlaylistId(
-            'https://www.youtube.com/playlist?list=PLCSusC_jlo14J0uBgFqfHsKu7gc5W2HyM',
+            'https://www.youtube.com/playlist?list=PLUpIWHnoHbGwSEJlDFpo9c5v3wk2DXLqo',
           ),
         )
         .toList();
@@ -70,5 +70,12 @@ void main() {
         expect(yt!.playlists.getVideos(val), emits(isNotNull));
       });
     }
+  });
+
+  test('Get videos of YT music playlist', () async {
+    final videos = await yt!.playlists
+        .getVideos('RDCLAK5uy_m9Rw_g5eCJtMhuRgP1eqU3H-XW7UL6uWQ')
+        .toList();
+    expect(videos.length, greaterThan(100));
   });
 }

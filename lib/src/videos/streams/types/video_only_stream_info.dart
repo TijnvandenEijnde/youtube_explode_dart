@@ -1,15 +1,18 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:http_parser/http_parser.dart';
 
-import '../../../youtube_explode_dart.dart';
-import '../../reverse_engineering/models/fragment.dart';
-import 'stream_info.dart';
+import '../../../../youtube_explode_dart.dart';
+import '../../../reverse_engineering/models/fragment.dart';
+import '../mixins/stream_info.dart';
 
 part 'video_only_stream_info.g.dart';
 
 /// YouTube media stream that only contains video.
 @JsonSerializable()
 class VideoOnlyStreamInfo with StreamInfo, VideoStreamInfo {
+  @override
+  final VideoId videoId;
+
   @override
   final int tag;
 
@@ -51,6 +54,7 @@ class VideoOnlyStreamInfo with StreamInfo, VideoStreamInfo {
   final MediaType codec;
 
   VideoOnlyStreamInfo(
+    this.videoId,
     this.tag,
     this.url,
     this.container,

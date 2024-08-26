@@ -1,3 +1,27 @@
+## 2.2.1
+- Implement `VideoClient.get` to fetch a list of related videos given another Video.
+
+## 2.2.0
+- Implement shorts filter. Thanks to @igormidev #269.
+- Implement `AudioTrack`s in `StreamInfo` to find the language of an audio track.
+- Added `fullManifest` optional parameter for `StreamClient.getManifest` to fetch a manifest with more streams, including all the languages provided by YouTube.
+- Fix issue where 1440p videos would be detected as 144p.
+- Fix endless loop with fetching some playlists.
+
+## 2.1.0
+- BREAKING CHANGE: 
+    - In `getUploadsFromPage`: the `videoSorting` parameter is now a named parameter
+- Shorts filter possibility added in `getUploadsFromPage`.
+
+## 2.0.4
+- Fix issue when parsing dates formatted as "Streamed <q> <unit> ago" due to a leading whitespace. #265
+
+## 2.0.3
+- Better performance for iterating through closed captions elements. #251
+- Add publishDate and viewCount for playlists. #240
+- Fix fetching of YT music playlists. #261
+- Fix like count extraction.
+
 ## 2.0.2
 - Implement YT Handles.
 - Deprecated ChannelLink icon's uri, they are no longer provided by YT.

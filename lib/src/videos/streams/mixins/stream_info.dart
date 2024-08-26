@@ -1,10 +1,14 @@
 import 'package:http_parser/http_parser.dart';
 
-import '../../reverse_engineering/models/fragment.dart';
-import '../videos.dart';
+import '../../../reverse_engineering/models/fragment.dart';
+import '../../videos.dart';
+import '../models/audio_track.dart';
 
 /// Generic YouTube media stream.
 mixin StreamInfo {
+  /// The video id of the video this stream belongs to.
+  VideoId get videoId;
+
   /// Whether the stream is throttled or not.
   bool get isThrottled =>
       url.queryParameters['ratebypass']?.toLowerCase() != 'yes';
@@ -41,7 +45,18 @@ mixin StreamInfo {
 /// Extension for Iterables of StreamInfo.
 extension StreamInfoIterableExt<T extends StreamInfo> on Iterable<T> {
   /// Gets the stream with highest bitrate.
-  T withHighestBitrate() => sortByBitrate().first;
+  T withHighestBitrate({String? language}) {
+    return where((stream) {
+      if (stream is AudioStreamInfo) {
+        if (language == null &&
+            (stream.audioTrack == null || stream.audioTrack!.audioIsDefault)) {
+          return true;
+        }
+        return stream.audioTrack?.id == language;
+      }
+      return true;
+    }).sortByBitrate().first;
+  }
 
   /// Gets the video streams sorted by bitrate in ascending order.
   /// This returns new list without editing the original list.
@@ -63,6 +78,8 @@ extension StreamInfoIterableExt<T extends StreamInfo> on Iterable<T> {
         if (e is VideoOnlyStreamInfo) 'video only',
         if (e is MuxedStreamInfo) 'muxed',
         e.size,
+        if (e case AudioStreamInfo(:AudioTrack audioTrack))
+          audioTrack.displayName,
       ]);
     }
     return column.toString();

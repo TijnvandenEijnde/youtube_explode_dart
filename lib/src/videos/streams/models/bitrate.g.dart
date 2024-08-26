@@ -2,20 +2,18 @@
 
 // ignore_for_file: non_constant_identifier_names, require_trailing_commas
 
-part of 'language.dart';
+part of 'bitrate.dart';
 
 // **************************************************************************
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$LanguageImpl _$$LanguageImplFromJson(Map<String, dynamic> json) =>
-    _$LanguageImpl(
-      json['code'] as String,
-      json['name'] as String,
+_$BitrateImpl _$$BitrateImplFromJson(Map<String, dynamic> json) =>
+    _$BitrateImpl(
+      json['bitsPerSecond'] as int,
     );
 
-Map<String, dynamic> _$$LanguageImplToJson(_$LanguageImpl instance) =>
+Map<String, dynamic> _$$BitrateImplToJson(_$BitrateImpl instance) =>
     <String, dynamic>{
-      'code': instance.code,
-      'name': instance.name,
+      'bitsPerSecond': instance.bitsPerSecond,
     };

@@ -10,6 +10,7 @@ part of 'audio_only_stream_info.dart';
 
 AudioOnlyStreamInfo _$AudioOnlyStreamInfoFromJson(Map<String, dynamic> json) =>
     AudioOnlyStreamInfo(
+      VideoId.fromJson(json['videoId'] as Map<String, dynamic>),
       json['tag'] as int,
       Uri.parse(json['url'] as String),
       StreamContainer.fromJson(json['container'] as Map<String, dynamic>),
@@ -21,11 +22,15 @@ AudioOnlyStreamInfo _$AudioOnlyStreamInfoFromJson(Map<String, dynamic> json) =>
           .map((e) => Fragment.fromJson(e as Map<String, dynamic>))
           .toList(),
       mediaTypeFromJson(json['codec'] as String),
+      json['audioTrack'] == null
+          ? null
+          : AudioTrack.fromJson(json['audioTrack'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$AudioOnlyStreamInfoToJson(
         AudioOnlyStreamInfo instance) =>
     <String, dynamic>{
+      'videoId': instance.videoId,
       'tag': instance.tag,
       'url': instance.url.toString(),
       'container': instance.container,
@@ -35,4 +40,5 @@ Map<String, dynamic> _$AudioOnlyStreamInfoToJson(
       'codec': mediaTypeToJson(instance.codec),
       'fragments': instance.fragments,
       'qualityLabel': instance.qualityLabel,
+      'audioTrack': instance.audioTrack,
     };
