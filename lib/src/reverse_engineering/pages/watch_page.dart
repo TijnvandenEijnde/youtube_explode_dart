@@ -1,7 +1,8 @@
+import 'dart:convert';
+
 import 'package:collection/collection.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as parser;
-import 'package:meta/meta.dart';
 
 import '../../../youtube_explode_dart.dart';
 import '../../extensions/helpers_extension.dart';
@@ -12,32 +13,31 @@ import '../player/player_response.dart';
 import 'player_config_base.dart';
 
 ///
-class WatchPage extends YoutubePage<_InitialData> {
+class WatchPage extends YoutubePage<WatchPageInitialData> {
+  final VideoId videoId;
+
   static final RegExp _videoLikeExp =
       RegExp(r'"label"\s*:\s*"([\d,\.]+) likes"');
   static final RegExp _videoDislikeExp =
       RegExp(r'"label"\s*:\s*"([\d,\.]+) dislikes"');
-  static final RegExp _visitorInfoLiveExp =
-      RegExp('VISITOR_INFO1_LIVE=([^;]+)');
-  static final RegExp _yscExp = RegExp('YSC=([^;]+)');
 
   @override
   // Overridden to be non-nullable.
   // ignore: overridden_fields
   final Document root;
 
-  @internal
-  final String visitorInfoLive;
+  /// Cookies linked to this webpage
+  final Map<String, String> cookies;
 
-  @internal
-  final String ysc;
+  String get cookieString =>
+      cookies.entries.map((e) => '${e.key}=${e.value}').join('; ');
 
   ///
   String? get sourceUrl {
     final url = root
         .querySelectorAll('script')
         .map((e) => e.attributes['src'])
-        .whereNotNull()
+        .nonNulls
         .firstWhereOrNull((e) => e.contains('player_ias') && e.endsWith('.js'));
     if (url == null) {
       return null;
@@ -86,13 +86,19 @@ class WatchPage extends YoutubePage<_InitialData> {
             '0',
       );
 
-  String? get commentsContinuation => initialData.commentsContinuation;
-
   static final _playerConfigExp = RegExp(r'ytplayer\.config\s*=\s*(\{.*\})');
 
   late final WatchPlayerConfig? playerConfig = getPlayerConfig();
 
-  late final PlayerResponse? playerResponse = getPlayerResponse();
+  late final PlayerResponse? playerResponse = getInitialPlayerResponse();
+
+  late final Map<String, dynamic> ytCfg = _getYtCfg();
+
+  Map<String, dynamic> _getYtCfg() {
+    return json.decode(RegExp(r'ytcfg\.set\s*\(\s*({.+?})\s*\)\s*;')
+        .firstMatch(root.outerHtml)!
+        .group(1)!);
+  }
 
   ///
   WatchPlayerConfig? getPlayerConfig() {
@@ -106,7 +112,7 @@ class WatchPage extends YoutubePage<_InitialData> {
     return WatchPlayerConfig(jsonMap);
   }
 
-  PlayerResponse? getPlayerResponse() {
+  PlayerResponse? getInitialPlayerResponse() {
     final scriptText = root
         .querySelectorAll('script')
         .map((e) => e.text)
@@ -122,22 +128,38 @@ class WatchPage extends YoutubePage<_InitialData> {
   }
 
   ///
-  WatchPage.parse(String raw, this.visitorInfoLive, this.ysc)
+  WatchPage.parse(String raw, this.videoId, this.cookies)
       : root = parser.parse(raw),
-        super(parser.parse(raw), (root) => _InitialData(root));
+        super(parser.parse(raw), (root) => WatchPageInitialData(root));
 
   ///
   static Future<WatchPage> get(YoutubeHttpClient httpClient, String videoId) {
     final url = Uri.parse(
-      'https://youtube.com/watch?v=$videoId&bpctr=9999999999&hl=en',
+      'https://www.youtube.com/watch?v=$videoId&bpctr=9999999999&has_verified=1&hl=en',
     );
-    return retry(httpClient, () async {
-      final req = await httpClient.get(url, validate: true);
+    const defaultCookies = 'PREF=hl=en&tz=UTC; SOCS=CAI; GPS=1';
+    const headers = {
+      'User-Agent':
+          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.18 Safari/537.36',
+      'Accept':
+          'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'Accept-Language': 'en-us,en;q=0.5',
+      'Sec-Fetch-Mode': 'navigate',
+      'Cookie': defaultCookies,
+    };
 
-      final cookies = req.headers['set-cookie']!;
-      final visitorInfoLive = _visitorInfoLiveExp.firstMatch(cookies)?.group(1);
-      final ysc = _yscExp.firstMatch(cookies)!.group(1)!;
-      final result = WatchPage.parse(req.body, visitorInfoLive ?? '', ysc);
+    final cookiesExp = RegExp(r'(?:^|,)(\w.+?)=(.*?);');
+
+    return retry(httpClient, () async {
+      final req = await httpClient.get(url, headers: headers, validate: true);
+
+      final cookieHeader = req.headers['set-cookie']!;
+      final matches = cookiesExp.allMatches(cookieHeader);
+      final cookies = Map.fromEntries(
+          matches.map((e) => MapEntry(e.group(1)!, e.group(2)!)))
+        ..addAll({'PREF': 'hl=en', 'SOCS': 'CAI', 'GPS': '1'});
+
+      final result = WatchPage.parse(req.body, VideoId(videoId), cookies);
 
       if (!result.isOk) {
         throw TransientFailureException('Video watch page is broken.');
@@ -168,15 +190,15 @@ class WatchPlayerConfig implements PlayerConfigBase {
       PlayerResponse.parse(root.get('args')!.getT<String>('playerResponse')!);
 }
 
-class _InitialData extends InitialData {
-  _InitialData(super.root);
+class WatchPageInitialData extends InitialData {
+  WatchPageInitialData(super.root);
 
   late final int? likesCount = _getLikes();
   late final int? disLikesCount = _getDislikes();
 
   int? _getLikes() {
     if (root['contents'] != null) {
-      final likes = root
+      final topLevelButtons = root
           .get('contents')
           ?.get('twoColumnWatchNextResults')
           ?.get('results')
@@ -186,13 +208,29 @@ class _InitialData extends InitialData {
           ?.get('videoPrimaryInfoRenderer')
           ?.get('videoActions')
           ?.get('menuRenderer')
-          ?.getList('topLevelButtons')
-          ?.firstWhereOrNull((e) => e['toggleButtonRenderer'] != null)
-          ?.get('toggleButtonRenderer')
-          ?.get('defaultText')
-          ?.get('accessibility')
-          ?.get('accessibilityData')
-          ?.getT<String>('label');
+          ?.getList('topLevelButtons');
+
+      if (topLevelButtons == null) {
+        return null;
+      }
+
+      final likes = topLevelButtons
+              .elementAtOrNull(0)
+              ?.get('segmentedLikeDislikeButtonViewModel')
+              ?.get('likeButtonViewModel')
+              ?.get('likeButtonViewModel')
+              ?.get('toggleButtonViewModel')
+              ?.get('toggleButtonViewModel')
+              ?.get('defaultButtonViewModel')
+              ?.get('buttonViewModel')
+              ?.getT<String>('accessibilityText') ??
+          topLevelButtons
+              .firstWhereOrNull((e) => e['toggleButtonRenderer'] != null)
+              ?.get('toggleButtonRenderer')
+              ?.get('defaultText')
+              ?.get('accessibility')
+              ?.get('accessibilityData')
+              ?.getT<String>('label');
 
       return likes.parseInt();
     }
@@ -224,29 +262,4 @@ class _InitialData extends InitialData {
     }
     return null;
   }
-
-  /*
-  contents.twoColumnWatchNextResults.results.results.contents[3].itemSectionRenderer.contents[0].continuationItemRenderer.continuationEndpoint.continuationCommand.token
-   */
-  JsonMap? getContinuationContext() {
-    if (root['contents'] != null) {
-      return root
-          .get('contents')
-          ?.get('twoColumnWatchNextResults')
-          ?.get('results')
-          ?.get('results')
-          ?.getList('contents')
-          ?.lastWhereOrNull((e) => e['itemSectionRenderer'] != null)
-          ?.get('itemSectionRenderer')
-          ?.getList('contents')
-          ?.firstOrNull
-          ?.get('continuationItemRenderer')
-          ?.get('continuationEndpoint')
-          ?.get('continuationCommand');
-    }
-    return null;
-  }
-
-  late final String commentsContinuation =
-      getContinuationContext()?.getT<String>('token') ?? '';
 }

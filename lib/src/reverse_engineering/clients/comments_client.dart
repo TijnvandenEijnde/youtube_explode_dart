@@ -30,12 +30,12 @@ class CommentsClient {
           () async => WatchPage.get(httpClient, video.id.value),
         );
 
-    final continuation = watchPage.commentsContinuation;
+    final continuation = watchPage.initialData.commentsContinuation;
     if (continuation == null) {
       return null;
     }
 
-    final data = await httpClient.sendPost('next', continuation);
+    final data = await httpClient.sendContinuation('next', continuation);
     return CommentsClient(data);
   }
 
@@ -44,7 +44,7 @@ class CommentsClient {
     YoutubeHttpClient httpClient,
     String token,
   ) async {
-    final data = await httpClient.sendPost('next', token);
+    final data = await httpClient.sendContinuation('next', token);
     return CommentsClient(data);
   }
 
@@ -129,7 +129,7 @@ onResponseReceivedEndpoints[1].reloadContinuationItemsCommand.continuationItems[
       return null;
     }
 
-    final data = await httpClient.sendPost('next', _continuationToken!);
+    final data = await httpClient.sendContinuation('next', _continuationToken!);
     return CommentsClient(data);
   }
 }
@@ -195,4 +195,28 @@ class _Comment {
 
   @override
   String toString() => '$author: $text';
+}
+
+extension _CommentsDataExtension on WatchPageInitialData {
+  JsonMap? getContinuationContext() {
+    if (root['contents'] != null) {
+      return root
+          .get('contents')
+          ?.get('twoColumnWatchNextResults')
+          ?.get('results')
+          ?.get('results')
+          ?.getList('contents')
+          ?.lastWhereOrNull((e) => e['itemSectionRenderer'] != null)
+          ?.get('itemSectionRenderer')
+          ?.getList('contents')
+          ?.firstOrNull
+          ?.get('continuationItemRenderer')
+          ?.get('continuationEndpoint')
+          ?.get('continuationCommand');
+    }
+    return null;
+  }
+
+  String? get commentsContinuation =>
+      getContinuationContext()?.getT<String>('token');
 }

@@ -6,7 +6,7 @@ part 'username.freezed.dart';
 
 /// Encapsulates a valid YouTube user name.
 @freezed
-class Username with _$Username {
+abstract class Username with _$Username {
   /// Initializes an instance of [Username].
   factory Username(String urlOrUsername) {
     final username = parseUsername(urlOrUsername);
@@ -37,10 +37,6 @@ class Username with _$Username {
   /// Returns true if the given username is a valid username.
   static bool validateUsername(String name) {
     if (name.isNullOrWhiteSpace) {
-      return false;
-    }
-
-    if (name.length > 20) {
       return false;
     }
 

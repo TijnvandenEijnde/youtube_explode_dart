@@ -2,6 +2,7 @@ import 'package:test/test.dart';
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 
 import 'data.dart';
+import 'skip_gh.dart';
 
 void main() {
   YoutubeExplode? yt;
@@ -53,7 +54,7 @@ void main() {
     expect(video.engagement.viewCount, greaterThanOrEqualTo(3000));
     expect(video.engagement.likeCount, greaterThanOrEqualTo(5));
     expect(video.engagement.dislikeCount, greaterThanOrEqualTo(0));
-  });
+  }, skip: skipGH);
 
   group('Get metadata of any video', () {
     for (final videoId in VideoIdData.valid) {
@@ -65,7 +66,7 @@ void main() {
         expect(video.publishDate, isNotNull);
       });
     }
-  });
+  }, skip: skipGH);
 
   group('Get metadata of invalid videos throws VideoUnplayableException', () {
     for (final val in VideoIdData.invalid) {
@@ -77,4 +78,25 @@ void main() {
       });
     }
   });
+
+  group('Get related videos of a video', () {
+    for (final val in VideoIdData.validWatchpage) {
+      test('VideoId - $val', () async {
+        final video = await yt!.videos.get(val.id);
+        final relatedVideos = await yt!.videos.getRelatedVideos(video);
+        expect(relatedVideos, isNotNull);
+        expect(relatedVideos, isNotEmpty);
+      });
+    }
+  }, skip: skipGH);
+
+  test('Get multiple pages of related videos', () async {
+    final video = await yt!.videos.get(VideoIdData.withHighQualityStreams.id);
+    var relatedVideos = await yt!.videos.getRelatedVideos(video);
+    expect(relatedVideos, isNotNull);
+    expect(relatedVideos, isNotEmpty);
+    relatedVideos = await relatedVideos!.nextPage();
+    expect(relatedVideos, isNotNull);
+    expect(relatedVideos, isNotEmpty);
+  }, skip: skipGH);
 }

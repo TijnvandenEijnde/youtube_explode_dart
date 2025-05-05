@@ -1,16 +1,21 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:http/http.dart' as http;
+import 'package:logging/logging.dart';
 
 import '../exceptions/exceptions.dart';
 import '../extensions/helpers_extension.dart';
 import '../retry.dart';
+import '../videos/streams/mixins/hls_stream_info.dart';
 import '../videos/streams/streams.dart';
+import 'hls_manifest.dart';
 
 /// HttpClient wrapper for YouTube
 class YoutubeHttpClient extends http.BaseClient {
   final http.Client _httpClient;
+  static final _logger = Logger('YoutubeExplode.HttpClient');
 
   // Flag to interrupt receiving stream.
   bool _closed = false;
@@ -19,17 +24,11 @@ class YoutubeHttpClient extends http.BaseClient {
 
   static const Map<String, String> _defaultHeaders = {
     'user-agent':
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36',
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.18 Safari/537.36',
     'cookie': 'CONSENT=YES+cb',
     'accept':
         'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-    'accept-language': 'en-US,en;q=0.9',
-    'sec-fetch-dest': 'document',
-    'sec-fetch-mode': 'navigate',
-    'sec-fetch-site': 'none',
-    'sec-fetch-user': '?1',
-    'sec-gpc': '1',
-    'upgrade-insecure-requests': '1',
+    'accept-language': 'en-US,en;q=0.5',
   };
 
   /// Initialize an instance of [YoutubeHttpClient]
@@ -142,6 +141,7 @@ class YoutubeHttpClient extends http.BaseClient {
     bool validate = true,
     int start = 0,
     int errorCount = 0,
+    required StreamClient streamClient,
   }) {
     if (streamInfo.fragments.isNotEmpty) {
       // DASH(fragmented) stream
@@ -153,9 +153,13 @@ class YoutubeHttpClient extends http.BaseClient {
         errorCount: errorCount,
       );
     }
+    if (streamInfo is HlsStreamInfo) {
+      return _getHlsStream(streamInfo);
+    }
     // Normal stream
     return _getStream(
       streamInfo,
+      streamClient: streamClient,
       headers: headers,
       validate: validate,
       start: start,
@@ -187,24 +191,45 @@ class YoutubeHttpClient extends http.BaseClient {
     bool validate = true,
     int start = 0,
     int errorCount = 0,
+    required StreamClient streamClient,
   }) async* {
-    final url = streamInfo.url;
+    var url = streamInfo.url;
     var bytesCount = start;
-
     while (!_closed && bytesCount != streamInfo.size.totalBytes) {
       try {
-        final response = await retry(this, () {
+        final response = await retry(this, () async {
           final from = bytesCount;
           final to = (streamInfo.isThrottled
-                  ? (bytesCount + 9898989)
+                  ? (bytesCount + 10379935)
                   : streamInfo.size.totalBytes) -
               1;
-          final request =
-              http.Request('get', url.setQueryParam('range', '$from-$to'));
+
+          late final http.Request request;
+          if (url.queryParameters['c'] == 'ANDROID') {
+            request = http.Request('get', url);
+            request.headers['Range'] = 'bytes=$from-$to';
+          } else {
+            request =
+                http.Request('get', url.setQueryParam('range', '$from-$to'));
+          }
           return send(request);
         });
         if (validate) {
-          _validateResponse(response, response.statusCode);
+          try {
+            _validateResponse(response, response.statusCode);
+          } on FatalFailureException {
+            final newManifest =
+                await streamClient.getManifest(streamInfo.videoId);
+            final stream = newManifest.streams
+                .firstWhereOrNull((e) => e.tag == streamInfo.tag);
+            if (stream == null) {
+              _logger.severe(
+                  'Error: Could not find the stream in the new manifest (due to Youtube error)');
+              rethrow;
+            }
+            url = stream.url;
+            continue;
+          }
         }
         final stream = StreamController<List<int>>();
         response.stream.listen(
@@ -227,6 +252,7 @@ class YoutubeHttpClient extends http.BaseClient {
         await Future.delayed(const Duration(milliseconds: 500));
         yield* _getStream(
           streamInfo,
+          streamClient: streamClient,
           headers: headers,
           validate: validate,
           start: bytesCount,
@@ -253,9 +279,21 @@ class YoutubeHttpClient extends http.BaseClient {
     return int.tryParse(response.headers['content-length'] ?? '');
   }
 
+  Future<JsonMap> sendContinuation(
+    String action,
+    String token, {
+    Map<String, String>? headers,
+  }) async =>
+      sendPost(action, {'continuation': token}, headers: headers);
+
   /// Sends a call to the youtube api endpoint.
-  Future<JsonMap> sendPost(String action, String token) async {
+  Future<JsonMap> sendPost(String action, Map<String, dynamic> data,
+      {Map<String, String>? headers}) {
     assert(action == 'next' || action == 'browse' || action == 'search');
+
+    final url = Uri.parse(
+      'https://www.youtube.com/youtubei/v1/$action?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
+    );
 
     final body = {
       'context': const {
@@ -267,15 +305,11 @@ class YoutubeHttpClient extends http.BaseClient {
           'clientVersion': "2.20220921.00.00",
         },
       },
-      'continuation': token,
+      ...data,
     };
 
-    final url = Uri.parse(
-      'https://www.youtube.com/youtubei/v1/$action?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8',
-    );
-
     return retry<JsonMap>(this, () async {
-      final raw = await post(url, body: json.encode(body));
+      final raw = await post(url, body: json.encode(body), headers: headers);
       if (_closed) throw HttpClientClosedException();
 
       //final now = DateTime.now();
@@ -283,6 +317,15 @@ class YoutubeHttpClient extends http.BaseClient {
       //    '${now.minute}.${now.second}.${now.millisecond}-$action-POST');
       return json.decode(raw.body);
     });
+  }
+
+  Stream<List<int>> _getHlsStream(HlsStreamInfo stream) async* {
+    final videoIndex = await getString(stream.url);
+    final video = HlsManifest.parseVideoSegments(videoIndex);
+    for (final segment in video) {
+      final data = await get(Uri.parse(segment.url));
+      yield data.bodyBytes;
+    }
   }
 
   @override
@@ -308,8 +351,11 @@ class YoutubeHttpClient extends http.BaseClient {
       }
     });
 
-    //print(request);
-    //print(StackTrace.current);
+    _logger.fine('Sending request: $request', null, StackTrace.current);
+    _logger.finer('Request headers: ${request.headers}');
+    if (request is http.Request) {
+      _logger.finer('Request body: ${request.body}');
+    }
     return _httpClient.send(request);
   }
 }

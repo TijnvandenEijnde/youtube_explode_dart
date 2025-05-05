@@ -1,3 +1,4 @@
+// dart format width=80
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
@@ -9,81 +10,65 @@ part of 'thumbnail_set.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 /// @nodoc
 mixin _$ThumbnailSet {
   /// Video id.
-  String get videoId => throw _privateConstructorUsedError;
+  String get videoId;
 
-  @JsonKey(ignore: true)
-  $ThumbnailSetCopyWith<ThumbnailSet> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $ThumbnailSetCopyWith<$Res> {
-  factory $ThumbnailSetCopyWith(
-          ThumbnailSet value, $Res Function(ThumbnailSet) then) =
-      _$ThumbnailSetCopyWithImpl<$Res, ThumbnailSet>;
-  @useResult
-  $Res call({String videoId});
-}
-
-/// @nodoc
-class _$ThumbnailSetCopyWithImpl<$Res, $Val extends ThumbnailSet>
-    implements $ThumbnailSetCopyWith<$Res> {
-  _$ThumbnailSetCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
+  /// Create a copy of ThumbnailSet
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
+  $ThumbnailSetCopyWith<ThumbnailSet> get copyWith =>
+      _$ThumbnailSetCopyWithImpl<ThumbnailSet>(
+          this as ThumbnailSet, _$identity);
+
   @override
-  $Res call({
-    Object? videoId = null,
-  }) {
-    return _then(_value.copyWith(
-      videoId: null == videoId
-          ? _value.videoId
-          : videoId // ignore: cast_nullable_to_non_nullable
-              as String,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is ThumbnailSet &&
+            (identical(other.videoId, videoId) || other.videoId == videoId));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, videoId);
+
+  @override
+  String toString() {
+    return 'ThumbnailSet(videoId: $videoId)';
   }
 }
 
 /// @nodoc
-abstract class _$$_ThumbnailSetCopyWith<$Res>
-    implements $ThumbnailSetCopyWith<$Res> {
-  factory _$$_ThumbnailSetCopyWith(
-          _$_ThumbnailSet value, $Res Function(_$_ThumbnailSet) then) =
-      __$$_ThumbnailSetCopyWithImpl<$Res>;
-  @override
+abstract mixin class $ThumbnailSetCopyWith<$Res> {
+  factory $ThumbnailSetCopyWith(
+          ThumbnailSet value, $Res Function(ThumbnailSet) _then) =
+      _$ThumbnailSetCopyWithImpl;
   @useResult
   $Res call({String videoId});
 }
 
 /// @nodoc
-class __$$_ThumbnailSetCopyWithImpl<$Res>
-    extends _$ThumbnailSetCopyWithImpl<$Res, _$_ThumbnailSet>
-    implements _$$_ThumbnailSetCopyWith<$Res> {
-  __$$_ThumbnailSetCopyWithImpl(
-      _$_ThumbnailSet _value, $Res Function(_$_ThumbnailSet) _then)
-      : super(_value, _then);
+class _$ThumbnailSetCopyWithImpl<$Res> implements $ThumbnailSetCopyWith<$Res> {
+  _$ThumbnailSetCopyWithImpl(this._self, this._then);
 
+  final ThumbnailSet _self;
+  final $Res Function(ThumbnailSet) _then;
+
+  /// Create a copy of ThumbnailSet
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
     Object? videoId = null,
   }) {
-    return _then(_$_ThumbnailSet(
-      null == videoId
-          ? _value.videoId
+    return _then(_self.copyWith(
+      videoId: null == videoId
+          ? _self.videoId
           : videoId // ignore: cast_nullable_to_non_nullable
               as String,
     ));
@@ -92,46 +77,71 @@ class __$$_ThumbnailSetCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_ThumbnailSet extends _ThumbnailSet {
-  const _$_ThumbnailSet(this.videoId) : super._();
+class _ThumbnailSet extends ThumbnailSet {
+  const _ThumbnailSet(this.videoId) : super._();
 
   /// Video id.
   @override
   final String videoId;
 
+  /// Create a copy of ThumbnailSet
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'ThumbnailSet(videoId: $videoId)';
-  }
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$ThumbnailSetCopyWith<_ThumbnailSet> get copyWith =>
+      __$ThumbnailSetCopyWithImpl<_ThumbnailSet>(this, _$identity);
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_ThumbnailSet &&
+            other is _ThumbnailSet &&
             (identical(other.videoId, videoId) || other.videoId == videoId));
   }
 
   @override
   int get hashCode => Object.hash(runtimeType, videoId);
 
-  @JsonKey(ignore: true)
+  @override
+  String toString() {
+    return 'ThumbnailSet(videoId: $videoId)';
+  }
+}
+
+/// @nodoc
+abstract mixin class _$ThumbnailSetCopyWith<$Res>
+    implements $ThumbnailSetCopyWith<$Res> {
+  factory _$ThumbnailSetCopyWith(
+          _ThumbnailSet value, $Res Function(_ThumbnailSet) _then) =
+      __$ThumbnailSetCopyWithImpl;
+  @override
+  @useResult
+  $Res call({String videoId});
+}
+
+/// @nodoc
+class __$ThumbnailSetCopyWithImpl<$Res>
+    implements _$ThumbnailSetCopyWith<$Res> {
+  __$ThumbnailSetCopyWithImpl(this._self, this._then);
+
+  final _ThumbnailSet _self;
+  final $Res Function(_ThumbnailSet) _then;
+
+  /// Create a copy of ThumbnailSet
+  /// with the given fields replaced by the non-null parameter values.
   @override
   @pragma('vm:prefer-inline')
-  _$$_ThumbnailSetCopyWith<_$_ThumbnailSet> get copyWith =>
-      __$$_ThumbnailSetCopyWithImpl<_$_ThumbnailSet>(this, _$identity);
+  $Res call({
+    Object? videoId = null,
+  }) {
+    return _then(_ThumbnailSet(
+      null == videoId
+          ? _self.videoId
+          : videoId // ignore: cast_nullable_to_non_nullable
+              as String,
+    ));
+  }
 }
 
-abstract class _ThumbnailSet extends ThumbnailSet {
-  const factory _ThumbnailSet(final String videoId) = _$_ThumbnailSet;
-  const _ThumbnailSet._() : super._();
-
-  @override
-
-  /// Video id.
-  String get videoId;
-  @override
-  @JsonKey(ignore: true)
-  _$$_ThumbnailSetCopyWith<_$_ThumbnailSet> get copyWith =>
-      throw _privateConstructorUsedError;
-}
+// dart format on

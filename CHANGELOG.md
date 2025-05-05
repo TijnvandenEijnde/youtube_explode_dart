@@ -1,3 +1,87 @@
+## 2.4.0
+- Update IOS client.
+- Implement visitor data extraction. Port from: https://github.com/Tyrrrz/YoutubeExplode/commit/84e29bb
+- Support freezed 3.0.0.
+
+## 2.3.10
+- Update dev_dependencies
+- Fix #328. Shorts extraction from channel uploads.
+- Skip tests that always fail on GitHub actions.
+
+## 2.3.9
+- Fix HLS extraction.
+- Fix JSEngine: -, * operators.
+
+## 2.3.8
+- Simplify Playlist ID matching logic by @khaled-0 in https://github.com/Hexer10/youtube_explode_dart/pull/316
+- Fix Parsing JSON response for shorts by @JorWo in https://github.com/Hexer10/youtube_explode_dart/pull/313
+- Added if-null check for playlist video count by @codedbycurtis in https://github.com/Hexer10/youtube_explode_dart/pull/317
+- Fixes for JSEngine.
+
+## 2.3.7
+- Fixes JSON parsing for shorts data
+
+## 2.3.6
+- Update search playlists parsing due to yt changes.
+- Implement >,<,== operators for `VideoResolution`.
+
+## 2.3.5
+- Deprecated `YoutubeApiClient.tvSimpleEmbedded`.
+- Improve JSEngine
+
+## 2.3.4
+- Better HLS support
+
+## 2.3.3
+- Re-implement sig deciphering.
+
+## 2.3.2
+- Implement HLS streams parsing.
+- Add safari, tv, and androidVr yt clients.
+
+## 2.3.1
+- Implement small JSEngine to decipher stream signatures.
+- Add channel thumbnails in search results. Thanks to  BinaryQuantumSoul. #289
+- Add `requireWatchPage` parameter to `getManifest` to fetch streams without having to get the watchpage.
+ 
+## 2.3.0+1
+- Updated changelog.
+
+## 2.3.0
+- Implement `YoutubeApiClient` interface.
+- Add `ytClient` parameter to `StreamClient.getManifest`.
+- Implement more youtube api clients, see `StreamClient.getManifest` documentation or `youtube_api_client.dart` for more information.
+
+## 2.2.3
+- Impersonate ios client to extract manifest.
+
+## 2.2.2
+- Fix video extraction. Thanks to @bigzhu #287.
+
+## 2.2.1
+- Implement `VideoClient.get` to fetch a list of related videos given another Video.
+
+## 2.2.0
+- Implement shorts filter. Thanks to @igormidev #269.
+- Implement `AudioTrack`s in `StreamInfo` to find the language of an audio track.
+- Added `fullManifest` optional parameter for `StreamClient.getManifest` to fetch a manifest with more streams, including all the languages provided by YouTube.
+- Fix issue where 1440p videos would be detected as 144p.
+- Fix endless loop with fetching some playlists.
+
+## 2.1.0
+- BREAKING CHANGE: 
+    - In `getUploadsFromPage`: the `videoSorting` parameter is now a named parameter
+- Shorts filter possibility added in `getUploadsFromPage`.
+
+## 2.0.4
+- Fix issue when parsing dates formatted as "Streamed <q> <unit> ago" due to a leading whitespace. #265
+
+## 2.0.3
+- Better performance for iterating through closed captions elements. #251
+- Add publishDate and viewCount for playlists. #240
+- Fix fetching of YT music playlists. #261
+- Fix like count extraction.
+
 ## 2.0.2
 - Implement YT Handles.
 - Deprecated ChannelLink icon's uri, they are no longer provided by YT.

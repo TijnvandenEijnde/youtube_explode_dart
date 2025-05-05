@@ -1,3 +1,4 @@
+// dart format width=80
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
@@ -9,85 +10,54 @@ part of 'channel_link.dart';
 // FreezedGenerator
 // **************************************************************************
 
+// dart format off
 T _$identity<T>(T value) => value;
-
-final _privateConstructorUsedError = UnsupportedError(
-    'It seems like you constructed your class using `MyClass._()`. This constructor is only meant to be used by freezed and you are not supposed to need it nor use it.\nPlease check the documentation here for more information: https://github.com/rrousselGit/freezed#custom-getters-and-methods');
 
 /// @nodoc
 mixin _$ChannelLink {
   /// Link title.
-  String get title => throw _privateConstructorUsedError;
+  String get title;
 
   /// Link URL.
   /// Already decoded with the YouTube shortener already taken out.
-  Uri get url => throw _privateConstructorUsedError;
+  Uri get url;
 
   /// Link Icon URL.
   @Deprecated(
       'As of at least 26-08-2023 YT no longer provides icons for links, so this URI is always empty')
-  Uri get icon => throw _privateConstructorUsedError;
+  Uri get icon;
 
-  @JsonKey(ignore: true)
-  $ChannelLinkCopyWith<ChannelLink> get copyWith =>
-      throw _privateConstructorUsedError;
-}
-
-/// @nodoc
-abstract class $ChannelLinkCopyWith<$Res> {
-  factory $ChannelLinkCopyWith(
-          ChannelLink value, $Res Function(ChannelLink) then) =
-      _$ChannelLinkCopyWithImpl<$Res, ChannelLink>;
-  @useResult
-  $Res call(
-      {String title,
-      Uri url,
-      @Deprecated(
-          'As of at least 26-08-2023 YT no longer provides icons for links, so this URI is always empty')
-      Uri icon});
-}
-
-/// @nodoc
-class _$ChannelLinkCopyWithImpl<$Res, $Val extends ChannelLink>
-    implements $ChannelLinkCopyWith<$Res> {
-  _$ChannelLinkCopyWithImpl(this._value, this._then);
-
-  // ignore: unused_field
-  final $Val _value;
-  // ignore: unused_field
-  final $Res Function($Val) _then;
-
+  /// Create a copy of ChannelLink
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
   @pragma('vm:prefer-inline')
+  $ChannelLinkCopyWith<ChannelLink> get copyWith =>
+      _$ChannelLinkCopyWithImpl<ChannelLink>(this as ChannelLink, _$identity);
+
   @override
-  $Res call({
-    Object? title = null,
-    Object? url = null,
-    Object? icon = null,
-  }) {
-    return _then(_value.copyWith(
-      title: null == title
-          ? _value.title
-          : title // ignore: cast_nullable_to_non_nullable
-              as String,
-      url: null == url
-          ? _value.url
-          : url // ignore: cast_nullable_to_non_nullable
-              as Uri,
-      icon: null == icon
-          ? _value.icon
-          : icon // ignore: cast_nullable_to_non_nullable
-              as Uri,
-    ) as $Val);
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is ChannelLink &&
+            (identical(other.title, title) || other.title == title) &&
+            (identical(other.url, url) || other.url == url) &&
+            (identical(other.icon, icon) || other.icon == icon));
+  }
+
+  @override
+  int get hashCode => Object.hash(runtimeType, title, url, icon);
+
+  @override
+  String toString() {
+    return 'ChannelLink(title: $title, url: $url, icon: $icon)';
   }
 }
 
 /// @nodoc
-abstract class _$$_ChannelLinkCopyWith<$Res>
-    implements $ChannelLinkCopyWith<$Res> {
-  factory _$$_ChannelLinkCopyWith(
-          _$_ChannelLink value, $Res Function(_$_ChannelLink) then) =
-      __$$_ChannelLinkCopyWithImpl<$Res>;
-  @override
+abstract mixin class $ChannelLinkCopyWith<$Res> {
+  factory $ChannelLinkCopyWith(
+          ChannelLink value, $Res Function(ChannelLink) _then) =
+      _$ChannelLinkCopyWithImpl;
   @useResult
   $Res call(
       {String title,
@@ -98,13 +68,14 @@ abstract class _$$_ChannelLinkCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$_ChannelLinkCopyWithImpl<$Res>
-    extends _$ChannelLinkCopyWithImpl<$Res, _$_ChannelLink>
-    implements _$$_ChannelLinkCopyWith<$Res> {
-  __$$_ChannelLinkCopyWithImpl(
-      _$_ChannelLink _value, $Res Function(_$_ChannelLink) _then)
-      : super(_value, _then);
+class _$ChannelLinkCopyWithImpl<$Res> implements $ChannelLinkCopyWith<$Res> {
+  _$ChannelLinkCopyWithImpl(this._self, this._then);
 
+  final ChannelLink _self;
+  final $Res Function(ChannelLink) _then;
+
+  /// Create a copy of ChannelLink
+  /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
   $Res call({
@@ -112,17 +83,17 @@ class __$$_ChannelLinkCopyWithImpl<$Res>
     Object? url = null,
     Object? icon = null,
   }) {
-    return _then(_$_ChannelLink(
-      null == title
-          ? _value.title
+    return _then(_self.copyWith(
+      title: null == title
+          ? _self.title
           : title // ignore: cast_nullable_to_non_nullable
               as String,
-      null == url
-          ? _value.url
+      url: null == url
+          ? _self.url
           : url // ignore: cast_nullable_to_non_nullable
               as Uri,
-      null == icon
-          ? _value.icon
+      icon: null == icon
+          ? _self.icon
           : icon // ignore: cast_nullable_to_non_nullable
               as Uri,
     ));
@@ -131,8 +102,8 @@ class __$$_ChannelLinkCopyWithImpl<$Res>
 
 /// @nodoc
 
-class _$_ChannelLink implements _ChannelLink {
-  const _$_ChannelLink(
+class _ChannelLink implements ChannelLink {
+  const _ChannelLink(
       this.title,
       this.url,
       @Deprecated(
@@ -154,16 +125,19 @@ class _$_ChannelLink implements _ChannelLink {
       'As of at least 26-08-2023 YT no longer provides icons for links, so this URI is always empty')
   final Uri icon;
 
+  /// Create a copy of ChannelLink
+  /// with the given fields replaced by the non-null parameter values.
   @override
-  String toString() {
-    return 'ChannelLink(title: $title, url: $url, icon: $icon)';
-  }
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @pragma('vm:prefer-inline')
+  _$ChannelLinkCopyWith<_ChannelLink> get copyWith =>
+      __$ChannelLinkCopyWithImpl<_ChannelLink>(this, _$identity);
 
   @override
-  bool operator ==(dynamic other) {
+  bool operator ==(Object other) {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
-            other is _$_ChannelLink &&
+            other is _ChannelLink &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.url, url) || other.url == url) &&
             (identical(other.icon, icon) || other.icon == icon));
@@ -172,38 +146,59 @@ class _$_ChannelLink implements _ChannelLink {
   @override
   int get hashCode => Object.hash(runtimeType, title, url, icon);
 
-  @JsonKey(ignore: true)
   @override
-  @pragma('vm:prefer-inline')
-  _$$_ChannelLinkCopyWith<_$_ChannelLink> get copyWith =>
-      __$$_ChannelLinkCopyWithImpl<_$_ChannelLink>(this, _$identity);
+  String toString() {
+    return 'ChannelLink(title: $title, url: $url, icon: $icon)';
+  }
 }
 
-abstract class _ChannelLink implements ChannelLink {
-  const factory _ChannelLink(
-      final String title,
-      final Uri url,
+/// @nodoc
+abstract mixin class _$ChannelLinkCopyWith<$Res>
+    implements $ChannelLinkCopyWith<$Res> {
+  factory _$ChannelLinkCopyWith(
+          _ChannelLink value, $Res Function(_ChannelLink) _then) =
+      __$ChannelLinkCopyWithImpl;
+  @override
+  @useResult
+  $Res call(
+      {String title,
+      Uri url,
       @Deprecated(
           'As of at least 26-08-2023 YT no longer provides icons for links, so this URI is always empty')
-      final Uri icon) = _$_ChannelLink;
-
-  @override
-
-  /// Link title.
-  String get title;
-  @override
-
-  /// Link URL.
-  /// Already decoded with the YouTube shortener already taken out.
-  Uri get url;
-  @override
-
-  /// Link Icon URL.
-  @Deprecated(
-      'As of at least 26-08-2023 YT no longer provides icons for links, so this URI is always empty')
-  Uri get icon;
-  @override
-  @JsonKey(ignore: true)
-  _$$_ChannelLinkCopyWith<_$_ChannelLink> get copyWith =>
-      throw _privateConstructorUsedError;
+      Uri icon});
 }
+
+/// @nodoc
+class __$ChannelLinkCopyWithImpl<$Res> implements _$ChannelLinkCopyWith<$Res> {
+  __$ChannelLinkCopyWithImpl(this._self, this._then);
+
+  final _ChannelLink _self;
+  final $Res Function(_ChannelLink) _then;
+
+  /// Create a copy of ChannelLink
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $Res call({
+    Object? title = null,
+    Object? url = null,
+    Object? icon = null,
+  }) {
+    return _then(_ChannelLink(
+      null == title
+          ? _self.title
+          : title // ignore: cast_nullable_to_non_nullable
+              as String,
+      null == url
+          ? _self.url
+          : url // ignore: cast_nullable_to_non_nullable
+              as Uri,
+      null == icon
+          ? _self.icon
+          : icon // ignore: cast_nullable_to_non_nullable
+              as Uri,
+    ));
+  }
+}
+
+// dart format on

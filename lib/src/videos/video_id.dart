@@ -3,10 +3,11 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import '../extensions/helpers_extension.dart';
 
 part 'video_id.freezed.dart';
+part 'video_id.g.dart';
 
 /// Encapsulates a valid YouTube video ID.
 @freezed
-class VideoId with _$VideoId {
+abstract class VideoId with _$VideoId {
   static final _regMatchExp = RegExp(r'youtube\..+?/watch.*?v=(.*?)(?:&|/|$)');
   static final _shortMatchExp = RegExp(r'youtu\.be/(.*?)(?:\?|&|/|$)');
   static final _embedMatchExp = RegExp(r'youtube\..+?/embed/(.*?)(?:\?|&|/|$)');
@@ -20,7 +21,7 @@ class VideoId with _$VideoId {
     if (id == null) {
       throw ArgumentError.value(
         idOrUrl,
-        'urlOrUrl',
+        'idOrUrl',
         'Invalid YouTube video ID or URL',
       );
     }
@@ -42,6 +43,9 @@ class VideoId with _$VideoId {
     }
     return VideoId(obj.toString());
   }
+
+  factory VideoId.fromJson(Map<String, dynamic> json) =>
+      _$VideoIdFromJson(json);
 
   @override
   String toString() => value;

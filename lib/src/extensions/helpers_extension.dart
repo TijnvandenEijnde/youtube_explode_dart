@@ -86,6 +86,31 @@ extension StringUtility on String {
   }
 
   DateTime parseDateTime() => DateTime.parse(this);
+
+  static final _viewCountExp = RegExp(r'^(\d+\.?\d+?)([KMB])? views$');
+
+  /// Parse view count from a string formatted as an integer and its magnitude.
+  /// Example: 5 views, 1.5K views, 2.3M views, 3.4B views.
+  /// If this fails returns null.
+  int? parseViewCount() {
+    final match = _viewCountExp.firstMatch(this);
+    if (match == null) {
+      return null;
+    }
+    if (match.groupCount != 2) {
+      return null;
+    }
+    final count = double.tryParse(match.group(1) ?? '1');
+    final unitStr = match.group(2);
+
+    final unit = switch (unitStr) {
+      'B' => 1000000000,
+      'M' => 1000000,
+      'K' => 1000,
+      _ => 1
+    };
+    return (count! * unit).toInt();
+  }
 }
 
 /// Utility for Strings.
@@ -136,42 +161,38 @@ extension StringUtility2 on String? {
     return false;
   }
 
-  /// Format: <quantity> <unit> ago (5 years ago)
+  /// Format: {quantity} {unit} ago (5 years ago)
   DateTime? toDateTime() {
     if (this == null) {
       return null;
     }
 
-    var parts = this!.split(' ');
+    var parts = this!.trim().split(' ');
     if (parts.length == 4) {
       // Streamed x y ago
       parts = parts.skip(1).toList();
     }
-    assert(parts.length == 3);
+
+    if (parts.length != 3) {
+      return null;
+    }
 
     final qty = int.parse(parts.first);
 
     // Try to get the unit
     final unit = parts[1];
-    Duration time;
-    if (unit.startsWith('second')) {
-      time = Duration(seconds: qty);
-    } else if (unit.startsWith('minute')) {
-      time = Duration(minutes: qty);
-    } else if (unit.startsWith('hour')) {
-      time = Duration(hours: qty);
-    } else if (unit.startsWith('day')) {
-      time = Duration(days: qty);
-    } else if (unit.startsWith('week')) {
-      time = Duration(days: qty * 7);
-    } else if (unit.startsWith('month')) {
-      time = Duration(days: qty * 30);
-    } else if (unit.startsWith('year')) {
-      time = Duration(days: qty * 365);
-    } else {
-      throw StateError("Couldn't parse $unit unit of time. "
-          'Please report this to the project page!');
-    }
+
+    final time = switch (unit) {
+      _ when unit.startsWith('second') => Duration(seconds: qty),
+      _ when unit.startsWith('minute') => Duration(minutes: qty),
+      _ when unit.startsWith('hour') => Duration(hours: qty),
+      _ when unit.startsWith('day') => Duration(days: qty),
+      _ when unit.startsWith('week') => Duration(days: qty * 7),
+      _ when unit.startsWith('month') => Duration(days: qty * 30),
+      _ when unit.startsWith('year') => Duration(days: qty * 365),
+      _ => throw StateError("Couldn't parse $unit unit of time. "
+          'Please report this to the project page!')
+    };
 
     return DateTime.now().subtract(time);
   }
@@ -232,7 +253,7 @@ extension GetOrNullMap on Map {
     return v;
   }
 
-  /// Get a List<Map<String, dynamic>>> from a map.
+  /// Get a [List<Map<String, dynamic>>>] from a map.
   List<Map<String, dynamic>>? getList(String key, [String? orKey]) {
     var v = this[key];
     if (v == null) {
@@ -250,6 +271,29 @@ extension GetOrNullMap on Map {
     }
 
     return v.toList().cast<Map<String, dynamic>>();
+  }
+
+  /// Access a value by using the json selection, for example contents/column/1/id
+  T? getJson<T>(String jsonPath) {
+    final parts = jsonPath.split('/');
+    dynamic value = this;
+    for (final part in parts) {
+      if (value is Map<String, dynamic>) {
+        value = value[part];
+      } else if (value is List<dynamic>) {
+        final index = int.tryParse(part);
+        if (index == null) {
+          return null;
+        }
+        if (index >= value.length) {
+          return null;
+        }
+        value = value[index];
+      } else {
+        return null;
+      }
+    }
+    return value as T;
   }
 }
 
